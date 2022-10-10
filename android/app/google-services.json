@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "733280798337",
+    "project_id": "event-management-app-d7b56",
+    "storage_bucket": "event-management-app-d7b56.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:733280798337:android:46b2db72437808d6292f80",
+        "android_client_info": {
+          "package_name": "com.helloworld.event_management"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "733280798337-d69m2d944f2s3ebu6u51kpd1hci5q81p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB99Ls2OV_g4lUMroQcoOsTRffkHOlmSR0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "733280798337-d69m2d944f2s3ebu6u51kpd1hci5q81p.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
