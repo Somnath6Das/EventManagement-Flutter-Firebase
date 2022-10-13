@@ -89,7 +89,7 @@ class OnBoardingScreen extends StatelessWidget {
                               color: Colors.white,
                               elevation: 4,
                               onPressed: () {
-                                Get.to(() => const LoginView());
+                                Get.to(() => LoginView());
                               },
                               child: const Text(
                                 'Get Started',
