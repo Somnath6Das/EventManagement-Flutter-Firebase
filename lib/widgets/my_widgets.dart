@@ -1,5 +1,4 @@
 import 'dart:ui';
-
 import 'package:event_management/utils/app_color.dart';
 import 'package:flutter/material.dart';
 
