@@ -49,12 +49,11 @@ class _AddProfileScreenState extends State<AddProfileScreen> {
                     final ImagePicker picker = ImagePicker();
                     final XFile? image =
                         await picker.pickImage(source: ImageSource.camera);
-
+                    // image cropper
                     if (image != null) {
                       CroppedFile? croppedImage = await ImageCropper()
                           .cropImage(
                               sourcePath: image.path, compressQuality: 20);
-
                       profileImage = File(croppedImage!.path);
                       setState(() {});
                       Navigator.pop(context);
@@ -72,12 +71,11 @@ class _AddProfileScreenState extends State<AddProfileScreen> {
                       final ImagePicker picker = ImagePicker();
                       final XFile? image =
                           await picker.pickImage(source: ImageSource.gallery);
-
+                      //image cropper
                       if (image != null) {
                         CroppedFile? croppedImage = await ImageCropper()
                           .cropImage(
                               sourcePath: image.path, compressQuality: 20);
-
                         profileImage = File(croppedImage!.path);
                         setState(() {});
                         Navigator.pop(context);

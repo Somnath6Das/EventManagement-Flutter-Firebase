@@ -1,22 +1,35 @@
+import 'dart:async';
+
 import 'package:event_management/views/login_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class OnBoardingScreen extends StatelessWidget {
+class OnBoardingScreen extends StatefulWidget {
   const OnBoardingScreen({super.key});
+
+  @override
+  State<OnBoardingScreen> createState() => _OnBoardingScreenState();
+}
+
+class _OnBoardingScreenState extends State<OnBoardingScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Timer(
+       const Duration(seconds: 3),
+        () => Navigator.push(
+            context, MaterialPageRoute(builder: (context) => const LoginView())));
+  }
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.white,
-        body: SizedBox(
-          width: double.infinity,
+        body: Center(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 50),
+              SizedBox(height: MediaQuery.of(context).size.height * 0.01),
               const Text(
                 "Welcome to EMS!",
                 style: TextStyle(
@@ -25,7 +38,7 @@ class OnBoardingScreen extends StatelessWidget {
                   fontWeight: FontWeight.w700,
                 ),
               ),
-              const SizedBox(height: 5),
+              SizedBox(height: MediaQuery.of(context).size.height * 0.03),
               const Text(
                 "Event Management System",
                 style: TextStyle(
@@ -34,15 +47,16 @@ class OnBoardingScreen extends StatelessWidget {
                   fontWeight: FontWeight.w700,
                 ),
               ),
-              const SizedBox(height: 50),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                child: Image.asset("assets/front.png"),
+              SizedBox(height: MediaQuery.of(context).size.height * 0.03),
+              Flexible(
+                child: Image.asset(
+                  "assets/front.png",
+                  height: MediaQuery.of(context).size.height * 0.4,
+                ),
               ),
-              const SizedBox(height: 50),
+              SizedBox(height: MediaQuery.of(context).size.height * 0.03),
               Expanded(
                 child: Container(
-                    width: double.infinity,
                     decoration: const BoxDecoration(
                         color: Colors.white,
                         boxShadow: [
@@ -57,9 +71,10 @@ class OnBoardingScreen extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 15),
-                          child: Text(
+                        Padding(
+                          padding: EdgeInsets.all(
+                              MediaQuery.of(context).size.height * 0.03),
+                          child: const Text(
                             'The sociol media platform designed to get you offline',
                             textAlign: TextAlign.center,
                             style: TextStyle(
@@ -68,9 +83,10 @@ class OnBoardingScreen extends StatelessWidget {
                             ),
                           ),
                         ),
-                        const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 15),
-                          child: Text(
+                        Padding(
+                          padding: EdgeInsets.all(
+                              MediaQuery.of(context).size.height * 0.01),
+                          child: const Text(
                             'The sociol media platform designed to get you offline',
                             textAlign: TextAlign.center,
                             style: TextStyle(
@@ -79,17 +95,14 @@ class OnBoardingScreen extends StatelessWidget {
                             ),
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 15,
-                          ),
+                        Flexible(
                           child: MaterialButton(
-                              height: 45,
+                              height: MediaQuery.of(context).size.height * 0.06,
                               minWidth: double.infinity,
                               color: Colors.white,
                               elevation: 4,
                               onPressed: () {
-                                Get.to(() => LoginView());
+                                Get.to(() => const LoginView());
                               },
                               child: const Text(
                                 'Get Started',
@@ -98,7 +111,9 @@ class OnBoardingScreen extends StatelessWidget {
                                     color: Color(0xff274560),
                                     fontWeight: FontWeight.w800),
                               )),
-                        )
+                        ),
+                        SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.03),
                       ],
                     )),
               )
