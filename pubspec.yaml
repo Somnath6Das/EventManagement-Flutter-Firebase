@@ -30,6 +30,7 @@ dependencies:
   cloud_firestore: null
   cloud_firestore_web: ^2.8.10
   cupertino_icons: ^1.0.2
+  dotted_border: ^2.0.0+3
   firebase_auth: ^3.11.2
   firebase_core: null
   firebase_storage: null

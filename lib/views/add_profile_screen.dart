@@ -14,6 +14,8 @@ class AddProfileScreen extends StatefulWidget {
   State<AddProfileScreen> createState() => _AddProfileScreenState();
 }
 
+
+
 class _AddProfileScreenState extends State<AddProfileScreen> {
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
@@ -34,6 +36,8 @@ class _AddProfileScreenState extends State<AddProfileScreen> {
   TextEditingController lastNameController = TextEditingController();
   TextEditingController mobileNumberController = TextEditingController();
   TextEditingController dobController = TextEditingController();
+
+ 
 
   imagePickDialog() {
     showDialog(

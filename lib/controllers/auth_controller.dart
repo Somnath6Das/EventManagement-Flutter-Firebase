@@ -19,7 +19,7 @@ class AuthController extends GetxController {
         .signInWithEmailAndPassword(email: email!, password: password!)
         .then((value) {
       isLoading(false);
-      Get.to(() => const HomeScreen());
+      Get.to(() => const BottomBarView());
     }).catchError((e) {
       isLoading(false);
       Get.snackbar(

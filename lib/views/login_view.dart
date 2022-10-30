@@ -38,6 +38,14 @@ class _LoginViewState extends State<LoginView> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+    forgetEmailController.dispose();
+  }
+  @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 2,

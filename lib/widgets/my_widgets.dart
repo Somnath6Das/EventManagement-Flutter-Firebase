@@ -83,10 +83,48 @@ Widget elevatedButton({text, Function? onPress}) {
     },
     child: Text(
       text,
-      style: TextStyle(
+      style: const TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.w500,
       ),
     ),
   );
 }
+
+Widget iconWithTitle({text, Function? func, bool? isShow = true}) {
+  return Row(children: [
+    //when isShaw has false value then show Expended widget
+    !isShow!
+        ? Container()
+        : Expanded(
+            flex: 0,
+            child: InkWell(
+              onTap: () {
+                func!();
+              },
+              child: Container(
+                margin: EdgeInsets.only(
+                    left: Get.width * 0.02,
+                    top: Get.height * 0.08,
+                    bottom: Get.height * 0.02),
+                width: 30,
+                height: 30,
+                // decoration: const BoxDecoration(
+                //     image: DecorationImage(
+                //         image: AssetImage('assets/left-arrow.png'))),
+              ),
+            )),
+    Expanded(
+      flex: 6,
+      child: Container(
+        alignment: Alignment.center,
+        margin: EdgeInsets.only(top: Get.height * 0.056),
+        child: myText(
+            text: text,
+            style: const TextStyle(fontSize: 23, fontWeight: FontWeight.w600)),
+      ),
+    ),
+    const Expanded(flex: 1, child: Text(''))
+  ]);
+}
+
