@@ -120,14 +120,87 @@ class _CreateEventViewState extends State<CreateEventView> {
                 ),
               ),
               media.isEmpty ? Container() : const SizedBox(height: 20),
-              // media.isEmpty ? Container() : SizedBox( width: Get.width, height: Get.width * 0.3,
-              // child: ListView.builder(itemBuilder: (context, index){
-              //   return media[index].isVideo! ? Container(
-
-              //   )
-              // })
-            
-              // )  
+              media.isEmpty
+                  ? Container()
+                  : SizedBox(
+                      width: Get.width,
+                      height: Get.width * 0.3,
+                      child: ListView.builder(
+                        itemCount: media.length,
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (context, index) {
+                          return media[index].isVideo!
+                              ? Container(
+                                  width: Get.width * 0.3,
+                                  height: Get.width * 0.3,
+                                  margin: const EdgeInsets.only(
+                                      right: 15, bottom: 10, top: 10),
+                                  decoration: BoxDecoration(
+                                      image: DecorationImage(
+                                          image: MemoryImage(
+                                              media[index].thumbnail!),
+                                          fit: BoxFit.fill),
+                                      borderRadius: BorderRadius.circular(10)),
+                                  child: Stack(
+                                    children: [
+                                      Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                          Padding(
+                                              padding: const EdgeInsets.all(5),
+                                              child: CircleAvatar(
+                                                child: IconButton(
+                                                  onPressed: () {
+                                                    media.removeAt(index);
+                                                    setState(() {});
+                                                  },
+                                                  icon: const Icon(Icons.close),
+                                                ),
+                                              ))
+                                        ],
+                                      ),
+                                      const Align(
+                                          alignment: Alignment.center,
+                                          child: Icon(
+                                              Icons.slow_motion_video_rounded,
+                                              color: Colors.black,
+                                              size: 40))
+                                    ],
+                                  ),
+                                )
+                              : Container(
+                                  width: Get.width * 0.3,
+                                  height: Get.width * 0.3,
+                                  margin: const EdgeInsets.only(
+                                      right: 15, bottom: 10, top: 10),
+                                  decoration: BoxDecoration(
+                                      image: DecorationImage(
+                                          image: FileImage(media[index].image!),
+                                          fit: BoxFit.fill),
+                                      borderRadius: BorderRadius.circular(10)),
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Padding(
+                                          padding: const EdgeInsets.all(5),
+                                          child: CircleAvatar(
+                                            child: IconButton(
+                                                onPressed: () {
+                                                  media.removeAt(index);
+                                                  setState(() {});
+                                                },
+                                                icon: const Icon(Icons.close)),
+                                          ))
+                                    ],
+                                  ));
+                        },
+                      )),
+              const SizedBox(height: 20),
             ]),
           )),
     )));
@@ -175,13 +248,15 @@ class _CreateEventViewState extends State<CreateEventView> {
     showDialog(
         builder: (BuildContext context) {
           return AlertDialog(
-              title: (image)? Text(
-                "Select image source",
-                style: TextStyle(color: Colors.blue[800]),
-              ) : Text(
-                "Select video source",
-                style: TextStyle(color: Colors.blue[800]),
-              ),
+              title: (image)
+                  ? Text(
+                      "Select image source",
+                      style: TextStyle(color: Colors.blue[800]),
+                    )
+                  : Text(
+                      "Select video source",
+                      style: TextStyle(color: Colors.blue[800]),
+                    ),
               content: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
