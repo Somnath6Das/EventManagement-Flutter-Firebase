@@ -1,8 +1,15 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:dotted_border/dotted_border.dart';
+import 'package:event_management/models/event_media_model.dart';
 import 'package:event_management/utils/app_color.dart';
 import 'package:event_management/widgets/my_widgets.dart';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
 
 class CreateEventView extends StatefulWidget {
   const CreateEventView({super.key});
@@ -16,6 +23,7 @@ class _CreateEventViewState extends State<CreateEventView> {
 
   String event_type = 'Public';
   List<String> list_item = ['Public', 'Private'];
+  List<EventMediaModel> media = [];
 
   @override
   Widget build(BuildContext context) {
@@ -110,7 +118,16 @@ class _CreateEventViewState extends State<CreateEventView> {
                     ),
                   ),
                 ),
-              )
+              ),
+              media.isEmpty ? Container() : const SizedBox(height: 20),
+              // media.isEmpty ? Container() : SizedBox( width: Get.width, height: Get.width * 0.3,
+              // child: ListView.builder(itemBuilder: (context, index){
+              //   return media[index].isVideo! ? Container(
+
+              //   )
+              // })
+            
+              // )  
             ]),
           )),
     )));
@@ -120,7 +137,10 @@ class _CreateEventViewState extends State<CreateEventView> {
     showDialog(
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Select media type', style: TextStyle(color: Colors.blue[800]),),
+            title: Text(
+              'Select media type',
+              style: TextStyle(color: Colors.blue[800]),
+            ),
             content: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -129,13 +149,21 @@ class _CreateEventViewState extends State<CreateEventView> {
                       Navigator.pop(context);
                       imageDialog(context, true);
                     },
-                    icon: Icon(Icons.image, size: 35, color: Colors.blue[600],)),
+                    icon: Icon(
+                      Icons.image,
+                      size: 35,
+                      color: Colors.blue[600],
+                    )),
                 IconButton(
                     onPressed: () {
                       Navigator.pop(context);
                       imageDialog(context, false);
                     },
-                    icon: Icon(Icons.slow_motion_video_outlined, size: 35, color: Colors.blue[600],))
+                    icon: Icon(
+                      Icons.slow_motion_video_outlined,
+                      size: 35,
+                      color: Colors.blue[600],
+                    ))
               ],
             ),
           );
@@ -143,5 +171,79 @@ class _CreateEventViewState extends State<CreateEventView> {
         context: context);
   }
 
-  void imageDialog(BuildContext context, bool image) {}
+  void imageDialog(BuildContext context, bool image) {
+    showDialog(
+        builder: (BuildContext context) {
+          return AlertDialog(
+              title: (image)? Text(
+                "Select image source",
+                style: TextStyle(color: Colors.blue[800]),
+              ) : Text(
+                "Select video source",
+                style: TextStyle(color: Colors.blue[800]),
+              ),
+              content: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    IconButton(
+                        onPressed: () {
+                          if (image) {
+                            getImageDialog(ImageSource.gallery);
+                          } else {
+                            getVideoDialog(ImageSource.gallery);
+                          }
+                        },
+                        icon: Icon(
+                          Icons.image,
+                          size: 35,
+                          color: Colors.blue[600],
+                        )),
+                    IconButton(
+                        onPressed: () {
+                          if (image) {
+                            getImageDialog(ImageSource.camera);
+                          } else {
+                            getVideoDialog(ImageSource.camera);
+                          }
+                        },
+                        icon: Icon(
+                          Icons.camera_alt,
+                          size: 35,
+                          color: Colors.blue[600],
+                        )),
+                  ]));
+        },
+        context: context);
+  }
+
+  getImageDialog(ImageSource source) async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: source);
+
+    if (image != null) {
+      media.add(EventMediaModel(
+          image: File(image.path), video: null, isVideo: false));
+    }
+    setState(() {});
+    Navigator.pop(context);
+  }
+
+  getVideoDialog(ImageSource source) async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? video = await picker.pickVideo(
+      source: source,
+    );
+    if (video != null) {
+      Uint8List? uint8list = await VideoThumbnail.thumbnailData(
+        video: video.path,
+        imageFormat: ImageFormat.PNG,
+        quality: 75,
+      );
+
+      media.add(EventMediaModel(
+          thumbnail: uint8list!, video: File(video.path), isVideo: true));
+    }
+    setState(() {});
+    Navigator.pop(context);
+  }
 }
