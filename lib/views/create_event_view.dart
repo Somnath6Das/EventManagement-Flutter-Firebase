@@ -1,11 +1,10 @@
 import 'dart:io';
 import 'dart:typed_data';
-
+import 'dart:async';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:event_management/models/event_media_model.dart';
 import 'package:event_management/utils/app_color.dart';
 import 'package:event_management/widgets/my_widgets.dart';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -24,6 +23,31 @@ class _CreateEventViewState extends State<CreateEventView> {
   String event_type = 'Public';
   List<String> list_item = ['Public', 'Private'];
   List<EventMediaModel> media = [];
+
+  TextEditingController titleController = TextEditingController();
+  TextEditingController locationController = TextEditingController();
+  TextEditingController dateController = TextEditingController();
+  TextEditingController maxEntries = TextEditingController();
+  TextEditingController tagsController = TextEditingController();
+
+  var selectedFrequency = -2;
+
+  DateTime? date = DateTime.now();
+  selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime(2015),
+        lastDate: DateTime(2101),
+        initialDatePickerMode: DatePickerMode.day);
+
+    if (picked != null) {
+      date = DateTime(picked.year, picked.month, picked.day, date!.hour,
+          date!.minute, date!.second);
+      dateController.text = '${date!.day}-${date!.month}-${date!.year}';
+    }
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -201,6 +225,228 @@ class _CreateEventViewState extends State<CreateEventView> {
                         },
                       )),
               const SizedBox(height: 20),
+              myTextField(
+                  bool: false,
+                  icon: 'assets/4DotIcon.png',
+                  text: 'Event Name',
+                  controller: titleController,
+                  validator: (String input) {
+                    if (input.isEmpty) {
+                      Get.snackbar('Warning', "Events name is required.",
+                          colorText: Colors.white,
+                          backgroundColor: Colors.blue);
+                      return '';
+                    }
+                    if (input.length < 3) {
+                      Get.snackbar('Warning',
+                          "Event name should be more than three characters",
+                          colorText: Colors.white,
+                          backgroundColor: Colors.blue);
+                      return '';
+                    }
+                    return null;
+                  }),
+              const SizedBox(height: 20),
+              myTextField(
+                  bool: false,
+                  icon: 'assets/location.png',
+                  text: 'Location',
+                  controller: locationController,
+                  validator: (String input) {
+                    if (input.isEmpty) {
+                      Get.snackbar('Warning', "Location name is required.",
+                          colorText: Colors.white,
+                          backgroundColor: Colors.blue);
+                      return '';
+                    }
+                    if (input.length < 3) {
+                      Get.snackbar('Warning', "Location name is Invalid",
+                          colorText: Colors.white,
+                          backgroundColor: Colors.blue);
+                      return '';
+                    }
+                    return null;
+                  }),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  iconTitleContainer(
+                      isReadOnly: true,
+                      path: 'assets/calender1.png',
+                      text: "Date",
+                      controller: dateController,
+                      validator: (input) {
+                        if (date == null) {
+                          Get.snackbar('Warning!', "Date id required!",
+                              colorText: Colors.white,
+                              backgroundColor: Colors.blue);
+                          return '';
+                        }
+                        return null;
+                      },
+                      onPress: () {
+                        selectDate(context);
+                      }),
+                  iconTitleContainer(
+                      path: 'assets/hash.png',
+                      text: 'Max Entries',
+                      controller: maxEntries,
+                      type: TextInputType.number,
+                      onPress: () {},
+                      validator: (String input) {
+                        if (input.isEmpty) {
+                          Get.snackbar('Warning!', "Entries is required.",
+                              colorText: Colors.white,
+                              backgroundColor: Colors.blue);
+                          return '';
+                        }
+                        return null;
+                      }),
+                ],
+              ),
+              const SizedBox(height: 20),
+              iconTitleContainer(
+                  path: 'assets/hash.png',
+                  text: 'Enter tags that will go with event.',
+                  width: double.infinity,
+                  controller: tagsController,
+                  type: TextInputType.text,
+                  onPress: () {},
+                  validator: (String input) {
+                    if (input.isEmpty) {
+                      Get.snackbar('Warning', "Entries is required.",
+                          colorText: Colors.white,
+                          backgroundColor: Colors.blue);
+                      return '';
+                    }
+                    return null;
+                  }),
+              const SizedBox(height: 20),
+              Container(
+                  height: 42,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    border:
+                        Border.all(width: 1, color: AppColors.genderTextColor),
+                  ),
+                  child: TextFormField(
+                      readOnly: true,
+                      onTap: () {
+                        Get.bottomSheet(
+                            StatefulBuilder(builder: (context, state) {
+                          return Container(
+                            width: double.infinity,
+                            height: Get.width * 0.6,
+                            decoration: const BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.only(
+                                    topRight: Radius.circular(10),
+                                    topLeft: Radius.circular(10))),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Row(
+                                  children: [
+                                    selectedFrequency == 10
+                                        ? Container()
+                                        : const SizedBox(
+                                            width: 10,
+                                          ),
+                                    Expanded(
+                                        child: InkWell(
+                                      onTap: () {
+                                        selectedFrequency = -1;
+                                        state(() {});
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 5, vertical: 10),
+                                        decoration: BoxDecoration(
+                                            color: selectedFrequency == -1
+                                                ? Colors.blue
+                                                : Colors.black.withOpacity(0.1),
+                                            borderRadius:
+                                                BorderRadius.circular(10)),
+                                        child: Center(
+                                          child: Text(
+                                            'Once',
+                                            style: TextStyle(
+                                                color: selectedFrequency != -1
+                                                    ? Colors.black
+                                                    : Colors.white),
+                                          ),
+                                        ),
+                                      ),
+                                    )),
+                                    selectedFrequency == 10
+                                        ? Container()
+                                        : const SizedBox(
+                                            width: 5,
+                                          ),
+                                    Expanded(
+                                        child: InkWell(
+                                      onTap: () {
+                                        selectedFrequency = 0;
+                                        state(() {});
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 5, vertical: 10),
+                                        decoration: BoxDecoration(
+                                          color: selectedFrequency == 0
+                                              ? Colors.blue
+                                              : Colors.black.withOpacity(0.1),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        child: Center(
+                                            child: Text(
+                                          "Daily",
+                                          style: TextStyle(
+                                              color: selectedFrequency != 0
+                                                  ? Colors.black
+                                                  : Colors.white),
+                                        )),
+                                      ),
+                                    )),
+                                    selectedFrequency == 10
+                                        ? Container()
+                                        : const SizedBox(
+                                            width: 5,
+                                          ),
+                                    Expanded(
+                                      child: InkWell(
+                                        onTap: () {
+                                          state(() {
+                                            selectedFrequency = 1;
+                                          });
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(10),
+                                            color: selectedFrequency == 1  ? Colors.blue : Colors.black.withOpacity(0.1),
+                                          ),
+                                        child: Center(child: Text("Weekly", style: TextStyle(
+                                          color: selectedFrequency != 1 ? Colors.black : Colors.white
+                                        ),),),),
+                                      ),
+                                    ),selectedFrequency == 10
+                                        ? Container()
+                                        : const SizedBox(
+                                            width: 10,
+                                          ),
+                                  ],
+                                ),
+                                Row(
+                                  children: [],
+                                )                                   //?    line : 597
+                              ],
+                            ),
+                          );
+                        }));
+                      }))
             ]),
           )),
     )));
