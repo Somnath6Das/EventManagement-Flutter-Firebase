@@ -29,7 +29,9 @@ class _CreateEventViewState extends State<CreateEventView> {
   TextEditingController dateController = TextEditingController();
   TextEditingController maxEntries = TextEditingController();
   TextEditingController tagsController = TextEditingController();
-
+  TextEditingController frequencyEventController = TextEditingController();
+  TextEditingController startTimeController = TextEditingController();
+  TimeOfDay startTime = const TimeOfDay(hour: 0, minute: 0);
   var selectedFrequency = -2;
 
   DateTime? date = DateTime.now();
@@ -46,6 +48,18 @@ class _CreateEventViewState extends State<CreateEventView> {
           date!.minute, date!.second);
       dateController.text = '${date!.day}-${date!.month}-${date!.year}';
     }
+    setState(() {});
+  }
+
+  startTimeMethod(BuildContext context) async {
+    final TimeOfDay? picked =
+        await showTimePicker(context: context, initialTime: TimeOfDay.now());
+    if (picked != null) {
+      startTime = picked;
+      startTimeController.text =
+          '${startTime.hourOfPeriod > 9 ? "" : '0'}${startTime.hour > 12 ? '${startTime.hour - 12}' : startTime.hour}:${startTime.minute > 9 ? startTime.minute : '0${startTime.minute}'} ${startTime.hour > 12 ? 'PM' : 'AM'}';
+    }
+    print("start${startTimeController.text}");
     setState(() {});
   }
 
@@ -331,122 +345,257 @@ class _CreateEventViewState extends State<CreateEventView> {
                         Border.all(width: 1, color: AppColors.genderTextColor),
                   ),
                   child: TextFormField(
-                      readOnly: true,
-                      onTap: () {
-                        Get.bottomSheet(
-                            StatefulBuilder(builder: (context, state) {
-                          return Container(
-                            width: double.infinity,
-                            height: Get.width * 0.6,
-                            decoration: const BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.only(
-                                    topRight: Radius.circular(10),
-                                    topLeft: Radius.circular(10))),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                Row(
-                                  children: [
-                                    selectedFrequency == 10
-                                        ? Container()
-                                        : const SizedBox(
-                                            width: 10,
-                                          ),
-                                    Expanded(
-                                        child: InkWell(
+                    readOnly: true,
+                    onTap: () {
+                      Get.bottomSheet(
+                          StatefulBuilder(builder: (context, state) {
+                        return Container(
+                          width: double.infinity,
+                          height: Get.width * 0.6,
+                          decoration: const BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.only(
+                                  topRight: Radius.circular(10),
+                                  topLeft: Radius.circular(10))),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Row(
+                                children: [
+                                  selectedFrequency == 10
+                                      ? Container()
+                                      : const SizedBox(
+                                          width: 10,
+                                        ),
+                                  Expanded(
+                                      child: InkWell(
+                                    onTap: () {
+                                      selectedFrequency = -1;
+                                      state(() {});
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 5, vertical: 10),
+                                      decoration: BoxDecoration(
+                                          color: selectedFrequency == -1
+                                              ? Colors.blue
+                                              : Colors.black.withOpacity(0.1),
+                                          borderRadius:
+                                              BorderRadius.circular(10)),
+                                      child: Center(
+                                        child: Text(
+                                          'Once',
+                                          style: TextStyle(
+                                              color: selectedFrequency != -1
+                                                  ? Colors.black
+                                                  : Colors.white),
+                                        ),
+                                      ),
+                                    ),
+                                  )),
+                                  selectedFrequency == 10
+                                      ? Container()
+                                      : const SizedBox(
+                                          width: 5,
+                                        ),
+                                  Expanded(
+                                      child: InkWell(
+                                    onTap: () {
+                                      selectedFrequency = 0;
+                                      state(() {});
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 5, vertical: 10),
+                                      decoration: BoxDecoration(
+                                        color: selectedFrequency == 0
+                                            ? Colors.blue
+                                            : Colors.black.withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: Center(
+                                          child: Text(
+                                        "Daily",
+                                        style: TextStyle(
+                                            color: selectedFrequency != 0
+                                                ? Colors.black
+                                                : Colors.white),
+                                      )),
+                                    ),
+                                  )),
+                                  selectedFrequency == 10
+                                      ? Container()
+                                      : const SizedBox(
+                                          width: 5,
+                                        ),
+                                  Expanded(
+                                    child: InkWell(
                                       onTap: () {
-                                        selectedFrequency = -1;
-                                        state(() {});
+                                        state(() {
+                                          selectedFrequency = 1;
+                                        });
                                       },
                                       child: Container(
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 5, vertical: 10),
                                         decoration: BoxDecoration(
-                                            color: selectedFrequency == -1
-                                                ? Colors.blue
-                                                : Colors.black.withOpacity(0.1),
-                                            borderRadius:
-                                                BorderRadius.circular(10)),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          color: selectedFrequency == 1
+                                              ? Colors.blue
+                                              : Colors.black.withOpacity(0.1),
+                                        ),
                                         child: Center(
                                           child: Text(
-                                            'Once',
+                                            "Weekly",
                                             style: TextStyle(
-                                                color: selectedFrequency != -1
+                                                color: selectedFrequency != 1
                                                     ? Colors.black
                                                     : Colors.white),
                                           ),
                                         ),
                                       ),
-                                    )),
-                                    selectedFrequency == 10
-                                        ? Container()
-                                        : const SizedBox(
-                                            width: 5,
-                                          ),
-                                    Expanded(
-                                        child: InkWell(
-                                      onTap: () {
-                                        selectedFrequency = 0;
-                                        state(() {});
-                                      },
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 5, vertical: 10),
-                                        decoration: BoxDecoration(
-                                          color: selectedFrequency == 0
-                                              ? Colors.blue
-                                              : Colors.black.withOpacity(0.1),
-                                          borderRadius:
-                                              BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                  selectedFrequency == 10
+                                      ? Container()
+                                      : const SizedBox(
+                                          width: 10,
                                         ),
-                                        child: Center(
-                                            child: Text(
-                                          "Daily",
-                                          style: TextStyle(
-                                              color: selectedFrequency != 0
-                                                  ? Colors.black
-                                                  : Colors.white),
-                                        )),
-                                      ),
-                                    )),
-                                    selectedFrequency == 10
-                                        ? Container()
-                                        : const SizedBox(
-                                            width: 5,
-                                          ),
-                                    Expanded(
-                                      child: InkWell(
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  selectedFrequency == 10
+                                      ? Container()
+                                      : const SizedBox(
+                                          width: 10,
+                                        ),
+                                  Expanded(
+                                    child: InkWell(
                                         onTap: () {
                                           state(() {
-                                            selectedFrequency = 1;
+                                            selectedFrequency = 2;
                                           });
                                         },
                                         child: Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 5, vertical: 10),
                                           decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(10),
-                                            color: selectedFrequency == 1  ? Colors.blue : Colors.black.withOpacity(0.1),
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              color: selectedFrequency == 2
+                                                  ? Colors.blue
+                                                  : Colors.black
+                                                      .withOpacity(0.1)),
+                                          child: Center(
+                                            child: Text("Monthly",
+                                                style: TextStyle(
+                                                    color:
+                                                        selectedFrequency != 2
+                                                            ? Colors.black
+                                                            : Colors.white)),
                                           ),
-                                        child: Center(child: Text("Weekly", style: TextStyle(
-                                          color: selectedFrequency != 1 ? Colors.black : Colors.white
-                                        ),),),),
-                                      ),
-                                    ),selectedFrequency == 10
-                                        ? Container()
-                                        : const SizedBox(
-                                            width: 10,
-                                          ),
-                                  ],
-                                ),
-                                Row(
-                                  children: [],
-                                )                                   //?    line : 597
-                              ],
-                            ),
-                          );
-                        }));
-                      }))
+                                        )),
+                                  ),
+                                  selectedFrequency == 10
+                                      ? Container()
+                                      : const SizedBox(
+                                          width: 10,
+                                        ),
+                                  Expanded(
+                                      child: InkWell(
+                                    child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 5, vertical: 10),
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          color: selectedFrequency == 3
+                                              ? Colors.blue
+                                              : Colors.black.withOpacity(0.1),
+                                        ),
+                                        child: Center(
+                                            child: Text('Yearly',
+                                                style: TextStyle(
+                                                    color:
+                                                        selectedFrequency != 3
+                                                            ? Colors.black
+                                                            : Colors.white)))),
+                                    onTap: () {
+                                      state(() {
+                                        selectedFrequency = 3;
+                                      });
+                                    },
+                                  )),
+                                  selectedFrequency == 10
+                                      ? Container()
+                                      : const SizedBox(width: 5)
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  MaterialButton(
+                                      minWidth: Get.width * 0.8,
+                                      onPressed: () {
+                                        frequencyEventController.text =
+                                            selectedFrequency == -1
+                                                ? 'Once'
+                                                : selectedFrequency == 0
+                                                    ? 'Daily'
+                                                    : selectedFrequency == 1
+                                                        ? 'Weekly'
+                                                        : selectedFrequency == 2
+                                                            ? 'Monthly'
+                                                            : 'Yearly';
+                                        Get.back();
+                                      },
+                                      color: Colors.blue,
+                                      child: const Text(
+                                        'Select',
+                                        style: TextStyle(
+                                            color: Colors.white), // line: 705
+                                      ))
+                                ],
+                              )
+                            ],
+                          ),
+                        );
+                      }));
+                    },
+                    validator: (String? input) {
+                      if (input!.isEmpty) {
+                        Get.snackbar('Warning', 'Frequency is required.',
+                            colorText: Colors.white,
+                            backgroundColor: Colors.blue);
+                        return '';
+                      }
+                      return null;
+                    },
+                    controller: frequencyEventController,
+                    decoration: InputDecoration(
+                        contentPadding: const EdgeInsets.only(top: 3),
+                        errorStyle: const TextStyle(fontSize: 0),
+                        hintStyle: TextStyle(color: AppColors.genderTextColor),
+                        border: InputBorder.none,
+                        hintText: 'Frequency of event',
+                        prefixIcon: Image.asset('assets/repeat.png')),
+                  )),
+              const SizedBox(height: 20),
+              // 747
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                iconTitleContainer(
+                    path: 'assets/time.png',
+                    text: 'Start Time',
+                    controller: startTimeController,
+                    isReadOnly: true,
+                    validator: (input) {},
+                    onPress: () {
+                      startTimeMethod(context);
+                    })
+              ])
             ]),
           )),
     )));
