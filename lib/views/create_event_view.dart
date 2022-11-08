@@ -31,7 +31,11 @@ class _CreateEventViewState extends State<CreateEventView> {
   TextEditingController tagsController = TextEditingController();
   TextEditingController frequencyEventController = TextEditingController();
   TextEditingController startTimeController = TextEditingController();
+  TextEditingController endTimeController = TextEditingController();
   TimeOfDay startTime = const TimeOfDay(hour: 0, minute: 0);
+  TimeOfDay endTime = const TimeOfDay(hour: 0, minute: 0);
+  TextEditingController descriptionController = TextEditingController();
+  TextEditingController priceController = TextEditingController();
   var selectedFrequency = -2;
 
   DateTime? date = DateTime.now();
@@ -62,6 +66,21 @@ class _CreateEventViewState extends State<CreateEventView> {
     print("start${startTimeController.text}");
     setState(() {});
   }
+
+  endTimeMethod(BuildContext context) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (picked != null) {
+      endTime = picked;
+      endTimeController.text =
+          '${endTime.hourOfPeriod > 9 ? "" : "0"}${endTime.hour > 9 ? "" : "0"}${endTime.hour > 12 ? '${endTime.hour - 12}' : endTime.hour}:${endTime.minute > 9 ? endTime.minute : '0${endTime.minute}'} ${endTime.hour > 12 ? 'PM' : 'AM'}';
+    }
+  }
+
+  String assessModifier = 'Closed';
+  List<String> close_list = ['Closed', 'Open'];
 
   @override
   Widget build(BuildContext context) {
@@ -110,7 +129,12 @@ class _CreateEventViewState extends State<CreateEventView> {
                           .map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem(
                           value: value,
-                          child: Text(value),
+                          child: Text(value,
+                          style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w400,
+                                    color: Color(0xffA6A6A6)),
+                          ),
                         );
                       }).toList(),
                     ),
@@ -594,8 +618,127 @@ class _CreateEventViewState extends State<CreateEventView> {
                     validator: (input) {},
                     onPress: () {
                       startTimeMethod(context);
-                    })
-              ])
+                    }),
+                iconTitleContainer(
+                    path: 'assets/time.png',
+                    text: 'End Time',
+                    isReadOnly: true,
+                    controller: endTimeController,
+                    validator: (input) {},
+                    onPress: () {
+                      endTimeMethod(context);
+                    }),
+              ]),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  myText(
+                      text: 'Description/Instruction',
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w700))
+                ],
+              ),
+              const SizedBox(height: 20),
+              Container(
+                height: 149,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    border:
+                        Border.all(width: 1, color: AppColors.genderTextColor)),
+                child: TextFormField(
+                  maxLines: 5,
+                  controller: descriptionController,
+                  validator: (input) {
+                    if (input!.isEmpty) {
+                      Get.snackbar('Warning', 'Description is required.',
+                          colorText: Colors.white,
+                          backgroundColor: Colors.blue);
+                      return '';
+                    }
+                    return null;
+                  },
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    contentPadding:
+                        const EdgeInsets.only(top: 25, left: 15, right: 15),
+                    hintStyle: TextStyle(color: AppColors.genderTextColor),
+                    hintText:
+                        'Write a summary and any details your invitee should know about the event...',
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: Get.height * 0.02,
+              ),
+              Container(
+                alignment: Alignment.topLeft,
+                child: myText(
+                    text: 'Who can invite?',
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.w700)),
+              ),
+              SizedBox(
+                height: Get.height * 0.005,
+              ),
+              Row(
+                  // 835
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                        alignment: Alignment.center,
+                        padding: const EdgeInsets.only(left: 10, right: 10),
+                        width: 150,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                              width: 1, color: AppColors.genderTextColor),
+                        ),
+                        child: DropdownButton(
+                          isExpanded: true,
+                          underline: Container(),
+                          icon: Image.asset('assets/down-arrow.png',width: 20),
+                          elevation: 16,
+                          style: TextStyle(
+                              fontWeight: FontWeight.w400,
+                              color: AppColors.black),
+                          value: assessModifier,
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              assessModifier = newValue!;
+                            });
+                          },
+                          items: close_list
+                              .map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem(                              
+                              value: value,
+                              child: Text(
+                                value,
+                                style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w400,
+                                    color: Color(0xffA6A6A6)),
+                              ),
+                            );
+                          }).toList(),
+                        )),
+                    iconTitleContainer(
+                        path: 'assets/dollarLogo.png',
+                        text: 'price',
+                        type: TextInputType.number,
+                        height: 40,
+                        controller: priceController,
+                        onPress: () {},
+                        validator: (String input) {
+                          if (input.isEmpty) {
+                            Get.snackbar('Warning', 'Price is required',
+                                colorText: Colors.white,
+                                backgroundColor: Colors.blue);
+                            return '';
+                          }
+                        })
+                  ]),
+                  SizedBox(height: Get.height * 0.03,) //910
             ]),
           )),
     )));
