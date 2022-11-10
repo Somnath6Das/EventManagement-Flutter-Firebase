@@ -2,9 +2,11 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'dart:async';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:event_management/controllers/data_controller.dart';
 import 'package:event_management/models/event_media_model.dart';
 import 'package:event_management/utils/app_color.dart';
 import 'package:event_management/widgets/my_widgets.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -25,6 +27,7 @@ class _CreateEventViewState extends State<CreateEventView> {
   List<EventMediaModel> media = [];
 
   TextEditingController titleController = TextEditingController();
+  TextEditingController timeController = TextEditingController();
   TextEditingController locationController = TextEditingController();
   TextEditingController dateController = TextEditingController();
   TextEditingController maxEntries = TextEditingController();
@@ -79,8 +82,49 @@ class _CreateEventViewState extends State<CreateEventView> {
     }
   }
 
-  String assessModifier = 'Closed';
+  String accessModifier = 'Closed';
   List<String> close_list = ['Closed', 'Open'];
+  var isCreatingEvent = false.obs;
+  List<Map<String, dynamic>> mediaUrls = [];
+
+  void resetControllers() {
+    dateController.clear();
+    timeController.clear();
+    titleController.clear();
+    locationController.clear();
+    priceController.clear();
+    descriptionController.clear();
+    tagsController.clear();
+    maxEntries.clear();
+    endTimeController.clear();
+    startTimeController.clear();
+    frequencyEventController.clear();
+    startTime = const TimeOfDay(hour: 0, minute: 0);
+    endTime = const TimeOfDay(hour: 0, minute: 0);
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    timeController.text = '${date!.hour}:${date!.minute}:${date!.second}';
+    dateController.text = '${date!.day}-${date!.month}-${date!.year}';
+  }
+
+  @override
+  void dispose() {
+    dateController.dispose();
+    timeController.dispose();
+    titleController.dispose();
+    locationController.dispose();
+    priceController.dispose();
+    descriptionController.dispose();
+    tagsController.dispose();
+    maxEntries.dispose();
+    endTimeController.dispose();
+    startTimeController.dispose();
+    frequencyEventController.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -129,11 +173,12 @@ class _CreateEventViewState extends State<CreateEventView> {
                           .map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem(
                           value: value,
-                          child: Text(value,
-                          style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w400,
-                                    color: Color(0xffA6A6A6)),
+                          child: Text(
+                            value,
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
+                                color: Color(0xffA6A6A6)),
                           ),
                         );
                       }).toList(),
@@ -697,20 +742,20 @@ class _CreateEventViewState extends State<CreateEventView> {
                         child: DropdownButton(
                           isExpanded: true,
                           underline: Container(),
-                          icon: Image.asset('assets/down-arrow.png',width: 20),
+                          icon: Image.asset('assets/down-arrow.png', width: 20),
                           elevation: 16,
                           style: TextStyle(
                               fontWeight: FontWeight.w400,
                               color: AppColors.black),
-                          value: assessModifier,
+                          value: accessModifier,
                           onChanged: (String? newValue) {
                             setState(() {
-                              assessModifier = newValue!;
+                              accessModifier = newValue!;
                             });
                           },
                           items: close_list
                               .map<DropdownMenuItem<String>>((String value) {
-                            return DropdownMenuItem(                              
+                            return DropdownMenuItem(
                               value: value,
                               child: Text(
                                 value,
@@ -738,7 +783,94 @@ class _CreateEventViewState extends State<CreateEventView> {
                           }
                         })
                   ]),
-                  SizedBox(height: Get.height * 0.03,) //910
+              SizedBox(
+                height: Get.height * 0.03,
+              ),
+              Obx(() => isCreatingEvent.value
+                  ? const Center(child: CircularProgressIndicator())
+                  : SizedBox(
+                      height: 42,
+                      width: double.infinity,
+                      child: elevatedButton(
+                          onPress: () async {
+                            if (!formKey.currentState!.validate()) {
+                              return;
+                            }
+                            if (media.isEmpty) {
+                              Get.snackbar('Warning', "Media is required",
+                                  colorText: Colors.white,
+                                  backgroundColor: Colors.blue);
+                              return;
+                            }
+                            if (tagsController.text.isEmpty) {
+                              Get.snackbar('Warning', "Tag is required.",
+                                  colorText: Colors.white,
+                                  backgroundColor: Colors.blue);
+                              return;
+                            }
+                            isCreatingEvent(true);
+                            DataController dataController = Get.find();
+
+                            if (media.isNotEmpty) {
+                              for (int i = 0; i < media.length; i++) {
+                                if (media[i].isVideo!) {
+                                  String thumbnailUrl = await dataController
+                                      .uploadThumbnailToFirebase(
+                                          media[i].thumbnail!);
+
+                                  String videoUrl = await dataController
+                                      .uploadImageToFirebase(media[i].video!);
+
+                                  mediaUrls.add({
+                                    'url': videoUrl,
+                                    'thumbnail': thumbnailUrl,
+                                    'isImage': false
+                                  });
+                                } else {
+                                  String imageUrl = await dataController
+                                      .uploadImageToFirebase(media[i].image!);
+                                  mediaUrls
+                                      .add({'url': imageUrl, 'isImage': true});
+                                }
+                              }
+                            }
+                            List<String> tags = tagsController.text.split(',');
+                            Map<String, dynamic> eventData = {
+                              'event': event_type,
+                              'event_name': titleController.text,
+                              'location': locationController.text,
+                              'data':
+                                  '${date!.day}-${date!.month}-${date!.year}',
+                              'start_time': startTimeController.text,
+                              'end-time': endTimeController.text,
+                              'max_entries': int.parse(maxEntries.text),
+                              'frequency_of_event':
+                                  frequencyEventController.text,
+                              'description': descriptionController.text,
+                              'who_can_invite': accessModifier,
+                              'joined': [
+                                FirebaseAuth.instance.currentUser!.uid
+                              ],
+                              'price': priceController.text,
+                              'media': mediaUrls,
+                              'uid': FirebaseAuth.instance.currentUser!.uid,
+                              'tags': tags,
+                              'inviter': [
+                                FirebaseAuth.instance.currentUser!.uid
+                              ]
+                            };
+
+                            await dataController
+                                .createEvent(eventData)
+                                .then((value) {
+                              isCreatingEvent(false);
+                              resetControllers();
+                            });
+                          },
+                          text: 'Create Event'))),
+              SizedBox(
+                height: Get.height * 0.03,
+              )
             ]),
           )),
     )));

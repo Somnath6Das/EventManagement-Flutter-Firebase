@@ -1,9 +1,12 @@
+import 'package:event_management/controllers/data_controller.dart';
 import 'package:event_management/views/community_screen.dart';
 import 'package:event_management/views/create_event_view.dart';
 import 'package:event_management/views/home_screen.dart';
 import 'package:event_management/views/message_screen.dart';
 import 'package:event_management/views/profile_screen.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class BottomBarView extends StatefulWidget {
   const BottomBarView({super.key});
@@ -32,7 +35,11 @@ class _BottomBarViewState extends State<BottomBarView> {
   @override
   void initState() {
     super.initState();
-    // Call a controller function
+    Get.put(DataController(), permanent: true);
+    FirebaseMessaging.instance.getInitialMessage();
+    FirebaseMessaging.onMessage.listen((message) {
+      //  Local notification service
+    });
   }
 
   @override
@@ -49,7 +56,9 @@ class _BottomBarViewState extends State<BottomBarView> {
                 icon: Padding(
                   padding: const EdgeInsets.only(top: 5),
                   child: Image.asset(
-                    currentIndex == 0 ? 'assets/home_hover.png' : 'assets/home.png',
+                    currentIndex == 0
+                        ? 'assets/home_hover.png'
+                        : 'assets/home.png',
                     width: 28,
                     height: 28,
                   ),
@@ -59,7 +68,9 @@ class _BottomBarViewState extends State<BottomBarView> {
                 icon: Padding(
                   padding: const EdgeInsets.only(top: 5),
                   child: Image.asset(
-                    currentIndex == 1 ? 'assets/clock_hover.png' : 'assets/clock.png',
+                    currentIndex == 1
+                        ? 'assets/clock_hover.png'
+                        : 'assets/clock.png',
                     width: 30,
                     height: 30,
                   ),
@@ -69,7 +80,9 @@ class _BottomBarViewState extends State<BottomBarView> {
                 icon: Padding(
                   padding: const EdgeInsets.only(top: 5),
                   child: Image.asset(
-                    currentIndex == 2 ? 'assets/plus_hover.png' : 'assets/plus.png',
+                    currentIndex == 2
+                        ? 'assets/plus_hover.png'
+                        : 'assets/plus.png',
                     width: 30,
                     height: 30,
                   ),
@@ -79,7 +92,9 @@ class _BottomBarViewState extends State<BottomBarView> {
                 icon: Padding(
                   padding: const EdgeInsets.only(top: 5),
                   child: Image.asset(
-                   currentIndex == 3 ? 'assets/comment_hover.png' : 'assets/comment.png',
+                    currentIndex == 3
+                        ? 'assets/comment_hover.png'
+                        : 'assets/comment.png',
                     width: 30,
                     height: 30,
                   ),
@@ -89,7 +104,9 @@ class _BottomBarViewState extends State<BottomBarView> {
                 icon: Padding(
                   padding: const EdgeInsets.only(top: 5),
                   child: Image.asset(
-                    currentIndex == 4 ? 'assets/user_hover.png' : 'assets/user.png',
+                    currentIndex == 4
+                        ? 'assets/user_hover.png'
+                        : 'assets/user.png',
                     width: 30,
                     height: 30,
                   ),
