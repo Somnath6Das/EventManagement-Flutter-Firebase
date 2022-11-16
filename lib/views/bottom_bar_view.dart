@@ -25,11 +25,11 @@ class _BottomBarViewState extends State<BottomBarView> {
   }
 
   List<Widget> widgetOption = [
-    HomeScreen(),
-    CommunityScreen(),
-    CreateEventView(),
-    MessageScreen(),
-    ProfileScreen()
+   const HomeScreen(),
+   const CommunityScreen(),
+   const CreateEventView(),
+   const MessageScreen(),
+   const ProfileScreen(),
   ];
 
   @override

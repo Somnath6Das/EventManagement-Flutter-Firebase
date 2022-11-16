@@ -137,4 +137,6 @@ class DataController extends GetxController {
       isEventsLoading(false);
     });
   }
+
+  
 }
