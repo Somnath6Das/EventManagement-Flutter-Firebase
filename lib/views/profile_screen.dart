@@ -1,4 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:event_management/controllers/data_controller.dart';
 import 'package:event_management/utils/app_color.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -17,6 +20,43 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool isNotEditable = true;
   String image = '';
   int? followers = 0, following = 0;
+
+  DataController? dataController;
+
+  @override
+  void initState() {
+    super.initState();
+    dataController = Get.find<DataController>();
+    firstNameController.text = dataController!.myDocument!.get('firstName');
+    lastNameController.text = dataController!.myDocument!.get('lastName');
+
+    try {
+      descriptionController.text = dataController!.myDocument!.get('desc');
+    } catch (e) {
+      descriptionController.text = '';
+    }
+
+    try {
+      image = dataController!.myDocument!.get('imageUrl');
+    } catch (e) {
+      image = '';
+    }
+    try {
+      locationController.text = dataController!.myDocument!.get('location');
+    } catch (e) {
+      locationController.text = '';
+    }
+    try {
+      followers = dataController!.myDocument!.get('followers').length;
+    } catch (e) {
+      followers = 0;
+    }
+    try {
+      following = dataController!.myDocument!.get('following').length;
+    } catch (e) {
+      following = 0;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -202,72 +242,169 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         children: [
                           Text(
                             "$followers",
-                            style:  TextStyle(
-                              fontSize: 16,
-                              color: AppColors.black,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: -0.3
-                            ),
+                            style: TextStyle(
+                                fontSize: 16,
+                                color: AppColors.black,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: -0.3),
                           ),
                           Text(
-                            "Followers", style: TextStyle(
-                              fontSize: 13
-                              , letterSpacing: -0.3,
-                              fontWeight: FontWeight.w400,
-                              color: AppColors.grey
-                            ),
+                            "Followers",
+                            style: TextStyle(
+                                fontSize: 13,
+                                letterSpacing: -0.3,
+                                fontWeight: FontWeight.w400,
+                                color: AppColors.grey),
                           )
                         ],
                       ),
-                       Container(width: 1, height: 35,
-                      color: const Color(0xff918F8F).withOpacity(0.5)),
+                      Container(
+                          width: 1,
+                          height: 35,
+                          color: const Color(0xff918F8F).withOpacity(0.5)),
                       Column(
                         children: [
-                          Text("$following",
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: AppColors.black,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: -0.3
+                          Text(
+                            "$following",
+                            style: TextStyle(
+                                fontSize: 16,
+                                color: AppColors.black,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: -0.3),
                           ),
-                          ),
-                          Text("Following",
-                          style: TextStyle(
-                            fontSize: 13,
-                            letterSpacing: -0.3,
-                            fontWeight: FontWeight.w400,
-                            color: AppColors.grey
-                          ),
+                          Text(
+                            "Following",
+                            style: TextStyle(
+                                fontSize: 13,
+                                letterSpacing: -0.3,
+                                fontWeight: FontWeight.w400,
+                                color: AppColors.grey),
                           )
                         ],
                       ),
-                      SizedBox(height: 40,
-                      width: screenWidth * 0.25,
-                      child: TextButton(
-                        style: TextButton.styleFrom(
-                          shape:const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
-                       backgroundColor: AppColors.blue
-                        ),
-                        onPressed: (){} ,
-                        child: Text('Follow',
-                        style: TextStyle(
-                          color: AppColors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500
-                        ),
-                        )),
+                      SizedBox(
+                        height: 40,
+                        width: screenWidth * 0.25,
+                        child: TextButton(
+                            style: TextButton.styleFrom(
+                                shape: const RoundedRectangleBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(15))),
+                                backgroundColor: AppColors.blue),
+                            onPressed: () {},
+                            child: Text(
+                              'Follow',
+                              style: TextStyle(
+                                  color: AppColors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500),
+                            )),
                       )
-                        //365
                     ],
                   ),
                 ),
-
-                //389
-
-                
+                const SizedBox(
+                  height: 40,
+                ),
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 20),
+                  child: DefaultTabController(
+                      length: 2,
+                      initialIndex: 0,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: <Widget>[
+                          Container(
+                            decoration: const BoxDecoration(
+                                border: Border(
+                                    bottom: BorderSide(
+                                        color: Colors.black, width: 0.01))),
+                            child: const TabBar(
+                                indicatorColor: Colors.blue,
+                                labelColor: Colors.blue,
+                                labelPadding: EdgeInsets.symmetric(
+                                    horizontal: 20, vertical: 10),
+                                unselectedLabelColor: Colors.black,
+                                tabs: [
+                                  Tab(
+                                    icon: Icon(
+                                      Icons.airplane_ticket,
+                                      size: 30,
+                                    ),
+                                  ),
+                                  Tab(
+                                    icon: Icon(
+                                      Icons.train_outlined,
+                                      size: 30,
+                                    ),
+                                  ),
+                                ]),
+                          ),
+                          Container(
+                            height: screenHeight * 0.46,
+                            decoration: const BoxDecoration(
+                                border: Border(
+                                    top: BorderSide(
+                                        color: Colors.white, width: 0.5))),
+                            child: TabBarView(
+                                physics: const NeverScrollableScrollPhysics(),
+                                children: <Widget>[
+                                  // ListView.builder(
+                                  //   shrinkWrap: true,
+                                  //   physics: const NeverScrollableScrollPhysics(),
+                                  //   scrollDirection: Axis.vertical,
+                                  // itemCount: ,   // 586
+                                  // itemBuilder: (context, index){
+                                  //   // return Container()
+                                  // }
+                                  //   )
+                                ]),
+                          )
+                        ],
+                      )),
+                )
               ],
             ),
-          )
+          ),
+          Align(
+            alignment: Alignment.topRight,
+            child: Container(
+              margin: const EdgeInsets.only(top: 105, right: 35),
+              child: InkWell(
+                onTap: () {
+                  if (isNotEditable == false) {
+                    FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(FirebaseAuth.instance.currentUser!.uid)
+                        .set({
+                      'firstName': firstNameController.text,
+                      'lastName': lastNameController.text,
+                      'location': locationController.text,
+                      'desc': descriptionController.text
+                    }, SetOptions(merge: true)).then((value) {
+                      Get.snackbar('Profile Updated',
+                          'Profile has been updated successfully.',
+                          colorText: Colors.white,
+                          backgroundColor: Colors.blue);
+                    });
+                  }
+
+                  setState(() {
+                    isNotEditable = !isNotEditable;
+                  });
+                },
+                child: isNotEditable
+                    ? const Icon(
+                        Icons.edit,
+                        color: Colors.black,
+                      )
+                    : const Icon(
+                        Icons.check,
+                        color: Colors.black,
+                      ),
+              ),
+            ),
+          ),
         ]),
       )),
     );

@@ -23,9 +23,10 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: ThemeData(
           textTheme: GoogleFonts.latoTextTheme(Theme.of(context).textTheme)),
-      home: FirebaseAuth.instance.currentUser!.uid == null
-          ? const OnBoardingScreen()
-          : const BottomBarView(),
+      home: const OnBoardingScreen()
+      // FirebaseAuth.instance.currentUser!.uid != null
+      //     ? const BottomBarView()
+      //     : const OnBoardingScreen(),
     );
   }
 }
