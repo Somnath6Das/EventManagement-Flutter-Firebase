@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:event_management/views/bottom_bar_view.dart';
 import 'package:event_management/views/login_view.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -16,9 +18,14 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
   void initState() {
     super.initState();
     Timer(
-       const Duration(seconds: 3),
-        () => Navigator.push(
-            context, MaterialPageRoute(builder: (context) => const LoginView())));
+        const Duration(seconds: 3),
+        () => Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    (FirebaseAuth.instance.currentUser != null)
+                        ? const BottomBarView()
+                        : const LoginView())));
   }
 
   @override

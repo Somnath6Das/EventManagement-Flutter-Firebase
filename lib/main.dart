@@ -24,9 +24,6 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
           textTheme: GoogleFonts.latoTextTheme(Theme.of(context).textTheme)),
       home: const OnBoardingScreen()
-      // FirebaseAuth.instance.currentUser!.uid != null
-      //     ? const BottomBarView()
-      //     : const OnBoardingScreen(),
     );
   }
 }
